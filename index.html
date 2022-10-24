@@ -1,0 +1,209 @@
+<!-- license: MIT -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      name="apple-mobile-web-app-capable"
+      content="yes"
+    />
+    <title>Barilla AR Card</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image.prod.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.1.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const debugMode = false
+
+        // debug controls
+        const startButton = document.querySelector("#start-button")
+        const stopButton = document.querySelector("#stop-button")
+        // debug plane
+        const debugArPlane = document.querySelector("#debug-ar-plane")
+
+        const sceneEl = document.querySelector("a-scene")
+        const arSystem = sceneEl.systems["mindar-image-system"]
+        const cameraEl = document.querySelector("#camera")
+        const targetEl = document.querySelector("#target")
+
+        if (debugMode) {
+          // starting and stoping AR in debug mode
+          startButton.addEventListener("click", () => {
+            arSystem.start() // start AR
+            console.log("AR System is started")
+          })
+          stopButton.addEventListener("click", () => {
+            arSystem.stop() // stop AR
+            console.log("AR System is stoped")
+          })
+
+          debugArPlane.addEventListener("click", (event) => {
+            console.log("ar plane is clicked")
+          })
+        } else {
+          // removig debug items and start AR
+          startButton.remove()
+          stopButton.remove()
+          debugArPlane.remove()
+
+          sceneEl.addEventListener("loaded", (event) => {
+            console.log("Scene is loaded")
+            arSystem.start() // start AR
+            console.log("AR System is started")
+          })
+        }
+
+        // handle refreshing raycaster objects
+        // clickable elems must be with class .can_be_clickable
+        const clickableElems = document.querySelectorAll(".can_be_clickable")
+        const refreshRaycaster = () => {
+          clickableElems.forEach((elem) => {
+            elem.classList.toggle("clickable")
+          })
+          cameraEl.components.raycaster.refreshObjects()
+        }
+        // listen target found and lost,
+        // refresh Raycaster objects (clickable elems)
+        targetEl.addEventListener("targetFound", (event) => {
+          refreshRaycaster()
+        })
+        targetEl.addEventListener("targetLost", (event) => {
+          refreshRaycaster()
+        })
+
+        // this app logic
+        const instButton = document.querySelector("#inst-link-button")
+        const headButton = document.querySelector("#head-button")
+        const headElem = document.querySelector("#head")
+
+        // inst button opens link in new tab
+        instButton.addEventListener("click", (event) => {
+          console.log("inst button is clicked")
+          window.open(
+            "https://rick-i-morty.online/seasons/6-sezon-1/",
+            "_blank"
+          )
+        })
+
+        // head button shows 3d model
+        headButton.addEventListener("click", (event) => {
+          console.log("face is actived")
+          headElem.object3D.visible = headElem.object3D.visible ? false : true
+        })
+      })
+    </script>
+  </head>
+  <body>
+    <!-- debug controls -->
+    <div style="position: absolute; z-index: 100">
+      <button id="start-button">Start</button>
+      <button id="stop-button">Stop</button>
+    </div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: /targets.mind; autoStart: false;"
+      embedded
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+        <video
+          id="video"
+          autoplay
+          loop="true"
+          src="./assets/video.mp4"
+        ></video>
+        <img
+          id="icon-inst"
+          src="./assets/inst-icon.webp"
+        />
+        <img
+          id="icon-person"
+          src="./assets/person-icon.png"
+        />
+        <a-asset-item
+          id="headModel"
+          src="/assets/3d/simple_asaro_head/scene.gltf"
+        ></a-asset-item>
+      </a-assets>
+
+      <a-camera
+        id="camera"
+        position="0 0 0"
+        look-controls="enabled: false"
+        cursor="fuse: false; rayOrigin: mouse;"
+        raycaster="autoRefresh: false; far: 10000; objects: .clickable"
+      ></a-camera>
+
+      <a-entity
+        id="target"
+        mindar-image-target="targetIndex: 0"
+      >
+        <!-- debug target plane -->
+        <a-plane
+          id="debug-ar-plane"
+          class="can_be_clickable"
+          color="blue"
+          opacity="0.5"
+          position="0 0 0"
+          height="0.45"
+          width="1"
+          rotation="0 0 0"
+        ></a-plane>
+
+        <!-- video elem -->
+        <a-video
+          laysinline
+          src="#video"
+          width="1"
+          height="0.5"
+          position="0 0.5 0"
+        ></a-video>
+
+        <!-- buttons -->
+        <a-entity position="0 -0.4 0">
+          <a-image
+            id="inst-link-button"
+            class="can_be_clickable"
+            src="#icon-inst"
+            height="0.2"
+            width="0.2"
+            position="-0.2 0 0"
+          ></a-image>
+          <a-image
+            id="head-button"
+            class="can_be_clickable"
+            src="#icon-person"
+            height="0.2"
+            width="0.2"
+            position="0.2 0 0"
+          ></a-image>
+        </a-entity>
+
+        <!-- 3D model -->
+        <a-gltf-model
+          id="head"
+          visible="false"
+          rotation="0 180 0"
+          position="0 0 -5"
+          scale="0.5 0.5 0.5"
+          src="#headModel"
+          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"
+        ></a-gltf-model>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
