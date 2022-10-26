@@ -23,7 +23,7 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const debugMode = false
+        const debugMode = true
 
         // debug controls
         const startButton = document.querySelector("#start-button")
@@ -111,7 +111,7 @@
     </div>
 
     <a-scene
-      mindar-image="imageTargetSrc: /targets.mind; autoStart: false;"
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: false;"
       embedded
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
@@ -124,18 +124,22 @@
           autoplay
           loop="true"
           src="./assets/video.mp4"
+          timeout="10000"
         ></video>
         <img
           id="icon-inst"
           src="./assets/inst-icon.webp"
+          timeout="10000"
         />
         <img
           id="icon-person"
           src="./assets/person-icon.png"
+          timeout="10000"
         />
         <a-asset-item
           id="headModel"
-          src="/assets/3d/simple_asaro_head/scene.gltf"
+          src="./assets/3d/simple_asaro_head/scene.gltf"
+          timeout="10000"
         ></a-asset-item>
       </a-assets>
 
