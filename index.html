@@ -72,13 +72,30 @@
           })
           cameraEl.components.raycaster.refreshObjects()
         }
+
+        // for autoplaying videos (when target is found)
+        const autoplayVideos = document.querySelectorAll(".autoplay_video")
+        const playAutoplayVideos = () => {
+          autoplayVideos.forEach((elem) => {
+            elem.play()
+          })
+        }
+        const pauseAutoplayVideos = () => {
+          autoplayVideos.forEach((elem) => {
+            elem.pause()
+          })
+        }
+
         // listen target found and lost,
-        // refresh Raycaster objects (clickable elems)
+        // refresh Raycaster objects (clickable elems),
+        // play and pause autoplay videos
         targetEl.addEventListener("targetFound", (event) => {
           refreshRaycaster()
+          playAutoplayVideos()
         })
         targetEl.addEventListener("targetLost", (event) => {
           refreshRaycaster()
+          pauseAutoplayVideos()
         })
 
         // this app logic
@@ -97,7 +114,7 @@
 
         // head button shows 3d model
         headButton.addEventListener("click", (event) => {
-          console.log("face is actived")
+          console.log("head is actived")
           headElem.object3D.visible = headElem.object3D.visible ? false : true
         })
       })
@@ -118,10 +135,11 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
-      <a-assets timeout="10000">
+      <a-assets>
         <video
+          class="autoplay_video"
           id="video"
-          autoplay
+          autoplay="false"
           loop="true"
           src="./assets/video.mp4"
         ></video>
@@ -165,7 +183,6 @@
 
         <!-- video elem -->
         <a-video
-          laysinline
           src="#video"
           width="1"
           height="0.5"
