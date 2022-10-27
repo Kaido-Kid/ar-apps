@@ -76,8 +76,23 @@
         // for autoplaying videos (when target is found)
         const autoplayVideos = document.querySelectorAll(".autoplay_video")
         const playAutoplayVideos = () => {
-          autoplayVideos.forEach((elem) => {
-            elem.play()
+          autoplayVideos.forEach(async (elem) => {
+            try {
+              await elem.play()
+            } catch (err) {
+              // TODO: fix for better
+              const noautoplayText = document.querySelector("#noautoplay-text")
+              noautoplayText.object3D.visible = true
+
+              window.addEventListener(
+                "click",
+                (event) => {
+                  noautoplayText.object3D.visible = false
+                  elem.play()
+                },
+                { once: true }
+              )
+            }
           })
         }
         const pauseAutoplayVideos = () => {
@@ -188,6 +203,17 @@
           height="0.5"
           position="0 0.5 0"
         ></a-video>
+        <!-- text if video didn't autoplay -->
+        <a-text
+          id="noautoplay-text"
+          visible="false"
+          width="1"
+          height="0.5"
+          position="0 0.5 0.001"
+          value="Click or tap to play video"
+          color="white"
+          align="center"
+        ></a-text>
 
         <!-- buttons -->
         <a-entity position="0 -0.4 0">
